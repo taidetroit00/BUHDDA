@@ -1,0 +1,33 @@
+name: Build ICP Prediction Game Canister
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'icp/**'
+  workflow_dispatch:
+
+jobs:
+  build-canister:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install DFX
+      run: |
+        curl -fsSL https://sdk.dfinity.org/install.sh | sh
+        echo "$HOME/bin" >> $GITHUB_PATH
+        
+    - name: Build prediction game canister
+      run: |
+        cd icp
+        dfx build prediction_game
+        
+    - name: Upload canister artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: prediction-game-canister
+        path: icp/.dfx/local/canisters/prediction_game/
+        retention-days: 30
